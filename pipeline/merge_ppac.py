@@ -1,18 +1,37 @@
 import pandas as pd
+import os
 
-print("Loading PPAC dataset...")
+print(" Loading PPAC raw datasets...")
 
-df = pd.read_csv("data/processed/ppac_combined.csv")
+# -------------------------------
+# LOAD RAW FILES (FIXED)
+# -------------------------------
+qty = pd.read_csv("data/raw/ppac_quantity_2023-2025.csv")
+rs = pd.read_csv("data/raw/ppac_rupees_2023-2025.csv")
+usd = pd.read_csv("data/raw/ppac_dollars_2023-2025.csv")
 
-# rename column
+# Add metric column
+qty["metric"] = "quantity"
+rs["metric"] = "rupees"
+usd["metric"] = "dollars"
+
+# Combine all
+df = pd.concat([qty, rs, usd], ignore_index=True)
+
+print(" Raw datasets combined")
+
+# -------------------------------
+# CLEANING
+# -------------------------------
+
+# rename column safely
 df = df.rename(columns={"IMPORT/EXPORT": "product"})
 
-# detect import/export sections
+# detect import/export
 mode = "Import"
 trade_type = []
 
 for val in df["product"]:
-
     val = str(val)
 
     if "EXPORT" in val:
@@ -28,22 +47,24 @@ for val in df["product"]:
 
 df["import_export"] = trade_type
 
-# remove header rows
+# remove unwanted rows
 df = df[df["import_export"].notna()]
-
-# remove TOTAL rows
 df = df[~df["product"].str.contains("TOTAL|NET", case=False, na=False)]
 
+# -------------------------------
+# MONTH PROCESSING
+# -------------------------------
 months = [
-"April","May","June","July","August","September",
-"October","November","December","January","February","March"
+    "April","May","June","July","August","September",
+    "October","November","December","January","February","March"
 ]
 
-# convert months to numeric
 for m in months:
     df[m] = pd.to_numeric(df[m], errors="coerce")
 
-# convert wide → long
+# -------------------------------
+# WIDE → LONG
+# -------------------------------
 df_long = df.melt(
     id_vars=["Year","product","import_export","metric"],
     value_vars=months,
@@ -53,7 +74,9 @@ df_long = df.melt(
 
 df_long = df_long.dropna(subset=["Value"])
 
-# pivot metrics
+# -------------------------------
+# FINAL PIVOT
+# -------------------------------
 df_final = df_long.pivot_table(
     index=["Year","product","import_export","Month"],
     columns="metric",
@@ -63,10 +86,15 @@ df_final = df_long.pivot_table(
 
 df_final.columns.name = None
 
+# -------------------------------
+# SAVE FILE (IMPORTANT FIX)
+# -------------------------------
+os.makedirs("data/processed", exist_ok=True)
+
 df_final.to_csv(
-    "data/processed/ppac_clean.csv",
+    "data/processed/ppac_cleaned.csv",   # 🔥 IMPORTANT NAME FIX
     index=False
 )
 
-print("PPAC cleaned dataset created")
+print(" PPAC cleaned dataset created")
 print("Rows:", len(df_final))

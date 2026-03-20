@@ -1,7 +1,11 @@
 pandas
 requests
 numpy
+sqlalchemy
 psycopg2-binary
 fastapi
 uvicorn
 openpyxl
+
+
+#uvicorn api.app:app --reload

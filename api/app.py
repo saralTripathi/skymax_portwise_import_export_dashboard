@@ -1,41 +1,40 @@
 from fastapi import FastAPI
-import psycopg2
 import pandas as pd
-import numpy as np
+import os
+from sqlalchemy import create_engine
 
 app = FastAPI()
 
 
-def get_connection():
 
-    conn = psycopg2.connect(
-        database="petroleum_trade",
-        user="postgres",
-        password="Saral@2004",
-        host="localhost",
-        port="5432"
-    )
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-    return conn
+if not DATABASE_URL:
+    raise Exception("❌ DATABASE_URL not found. Set it in environment variables.")
+
+engine = create_engine(DATABASE_URL)
 
 
 @app.get("/")
 def home():
-    return {"message": "Petroleum Trade API running"}
+    return {"message": "Petroleum Trade API running 🚀"}
+
+
 
 
 @app.get("/trade-data")
 def get_trade_data():
+    try:
+        query = "SELECT * FROM trade_data"
+        df = pd.read_sql(query, engine)
 
-    conn = get_connection()
+        # ✅ Fix NaN issue (important for JSON)
+        df = df.fillna(0)
 
-    query = "SELECT * FROM trade_data"
+        return df.to_dict(orient="records")
 
-    df = pd.read_sql(query, conn)
-
-    conn.close()
-
-    # FIX NaN values
-    df = df.replace({np.nan: None})
-
-    return df.to_dict(orient="records")
+    except Exception as e:
+        return {
+            "error": str(e),
+            "message": "Failed to fetch data from database"
+        }

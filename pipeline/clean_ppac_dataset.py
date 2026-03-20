@@ -1,65 +1,123 @@
 import pandas as pd
 
-file_path = r"data/processed/ppac_cleaned.csv"
+print(" Cleaning PPAC dataset...")
 
+# -------------------------------
+# LOAD DATA
+# -------------------------------
+file_path = "data/processed/ppac_combined.csv"
 df = pd.read_csv(file_path)
 
-# 🔥 detect correct column
-col_name = None
+print("Columns BEFORE cleaning:", list(df.columns))
+
+# -------------------------------
+# STEP 1: CLEAN COLUMN NAMES (SAFE)
+# -------------------------------
+df.columns = df.columns.str.strip()
+
+# -------------------------------
+# STEP 2: DETECT IMPORT/EXPORT COLUMN
+# -------------------------------
+product_col = None
 
 for col in df.columns:
-    col_clean = col.strip().upper().replace(" ", "")
+    col_clean = col.upper().replace(" ", "")
     if "IMPORT" in col_clean and "EXPORT" in col_clean:
-        col_name = col
+        product_col = col
         break
 
-if not col_name:
-    raise Exception(" IMPORT/EXPORT column not found")
+if not product_col:
+    raise Exception("❌ IMPORT/EXPORT column not found")
 
-print(f"Using column: {col_name}")
+print(f" Using column: {product_col}")
 
-# remove rows where product column is empty
-df = df[df[col_name].notna()]
+# -------------------------------
+# STEP 3: REMOVE INVALID ROWS
+# -------------------------------
+df = df[df[product_col].notna()]
 
-# remove rows containing text / notes
-remove_patterns = [
-    "Source",
-    "Notes",
-    "RIL",
-    "LNG",
-    "include",
-    "export data",
-]
+remove_patterns = ["Source", "Notes", "RIL", "LNG", "include", "export data"]
 
 for p in remove_patterns:
-    df = df[~df[col_name].str.contains(p, case=False, na=False)]
+    df = df[~df[product_col].str.contains(p, case=False, na=False)]
 
-# remove section headers
-bad_rows = [
-    "IMPORT^",
-    "PRODUCTS",
-    "PRODUCT IMPORT",
-    "PRODUCT EXPORT",
+bad_rows = ["IMPORT^", "PRODUCTS", "PRODUCT IMPORT", "PRODUCT EXPORT"]
+df = df[~df[product_col].isin(bad_rows)]
+
+# clean text
+df[product_col] = df[product_col].str.replace(r"[^\w\s/]", "", regex=True)
+
+# -------------------------------
+# STEP 4: STANDARDIZE MONTH COLUMNS (CONTROLLED)
+# -------------------------------
+month_map = {
+    "APR": "April",
+    "APRIL": "April",
+    "MAY": "May",
+    "JUN": "June",
+    "JUNE": "June",
+    "JUL": "July",
+    "JULY": "July",
+    "AUG": "August",
+    "AUGUST": "August",
+    "SEP": "September",
+    "SEPT": "September",
+    "SEPTEMBER": "September",
+    "OCT": "October",
+    "OCTOBER": "October",
+    "NOV": "November",
+    "NOVEMBER": "November",
+    "DEC": "December",
+    "DECEMBER": "December",
+    "JAN": "January",
+    "JANUARY": "January",
+    "FEB": "February",
+    "FEBRUARY": "February",
+    "MAR": "March",
+    "MARCH": "March",
+    "TOTAL": "Total"
+}
+
+rename_dict = {}
+
+for col in df.columns:
+    col_upper = col.upper().strip()
+    if col_upper in month_map:
+        rename_dict[col] = month_map[col_upper]
+
+df = df.rename(columns=rename_dict)
+
+print("Columns AFTER standardization:", list(df.columns))
+
+# -------------------------------
+# STEP 5: ENSURE REQUIRED MONTHS EXIST
+# -------------------------------
+required_months = [
+    "April","May","June","July","August","September",
+    "October","November","December","January","February","March","Total"
 ]
 
-df = df[~df[col_name].isin(bad_rows)]
+for m in required_months:
+    if m not in df.columns:
+        print(f"⚠️ Missing column: {m} → filling with 0")
+        df[m] = 0
 
-# clean product names
-df[col_name] = df[col_name].str.replace(r"[^\w\s/]", "", regex=True)
-
-# convert month columns
-months = [
-"April","May","June","July","August","September",
-"October","November","December","January","February","March","Total"
-]
-
-for m in months:
+# -------------------------------
+# STEP 6: CONVERT TO NUMERIC
+# -------------------------------
+for m in required_months:
     df[m] = pd.to_numeric(df[m], errors="coerce")
 
-# remove invalid rows
+# -------------------------------
+# STEP 7: REMOVE INVALID DATA
+# -------------------------------
 df = df[df["Total"].notna()]
 df = df[df["Total"] > 0]
 
+# -------------------------------
+# SAVE OUTPUT
+# -------------------------------
 df.to_csv("data/processed/ppac_cleaned.csv", index=False)
 
-print(" PPAC dataset cleaned successfully")
+print("✅ PPAC dataset cleaned successfully")
+print("Rows:", len(df))

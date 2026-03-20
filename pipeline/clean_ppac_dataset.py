@@ -1,25 +1,11 @@
 import pandas as pd
 
-file_path = r"data/processed/ppac_combined.csv"
+file_path = "data/processed/ppac_combined.csv"
 
 df = pd.read_csv(file_path)
 
-# 🔥 detect correct column
-col_name = None
-
-for col in df.columns:
-    col_clean = col.strip().upper().replace(" ", "")
-    if "IMPORT" in col_clean and "EXPORT" in col_clean:
-        col_name = col
-        break
-
-if not col_name:
-    raise Exception(" IMPORT/EXPORT column not found")
-
-print(f"Using column: {col_name}")
-
 # remove rows where product column is empty
-df = df[df[col_name].notna()]
+df = df[df["import_export"].notna()]
 
 # remove rows containing text / notes
 remove_patterns = [
@@ -32,7 +18,7 @@ remove_patterns = [
 ]
 
 for p in remove_patterns:
-    df = df[~df[col_name].str.contains(p, case=False, na=False)]
+    df = df[~df["product"].str.contains(p, case=False, na=False)]
 
 # remove section headers
 bad_rows = [
@@ -42,24 +28,21 @@ bad_rows = [
     "PRODUCT EXPORT",
 ]
 
-df = df[~df[col_name].isin(bad_rows)]
+df = df[~df["product"].isin(bad_rows)]
 
 # clean product names
-df[col_name] = df[col_name].str.replace(r"[^\w\s/]", "", regex=True)
+df["product"] = df["product"].str.replace(r"[^\w\s/]", "", regex=True)
 
-# convert month columns
-months = [
-"April","May","June","July","August","September",
-"October","November","December","January","February","March","Total"
-]
+# convert numeric columns
+for col in ["quantity", "rupees", "dollars"]:
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
-for m in months:
-    df[m] = pd.to_numeric(df[m], errors="coerce")
+# remove rows where all values are NaN
+df = df.dropna(subset=["quantity", "rupees", "dollars"], how="all")
 
-# remove invalid rows
-df = df[df["Total"].notna()]
-df = df[df["Total"] > 0]
-
+# save cleaned file
 df.to_csv("data/processed/ppac_cleaned.csv", index=False)
 
-print(" PPAC dataset cleaned successfully")
+print("PPAC dataset cleaned successfully")
+print("Rows:", len(df))

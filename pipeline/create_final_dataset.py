@@ -3,8 +3,8 @@ import pandas as pd
 print("Creating final dataset...")
 
 # load datasets
-ppac = pd.read_csv(r"C:\Users\om\Desktop\trade_data_project\data\processed\ppac_cleaned.csv")
-ports = pd.read_csv(r"C:\Users\om\Desktop\trade_data_project\data\processed\ipa_cleaned.csv")
+ppac = pd.read_csv(r"data\processed\ppac_cleaned.csv")
+ports = pd.read_csv(r"data\processed\ipa_cleaned.csv")
 
 # calculate port share
 total_traffic = ports["traffic_2025"].sum()

@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv(r"C:\Users\om\Desktop\trade_data_project\data\final\port_trade_dataset.csv")
+df = pd.read_csv(r"data\final\port_trade_dataset.csv")
 
 # remove rows where port is numeric
 df = df[~df["port"].astype(str).str.isnumeric()]
@@ -13,6 +13,6 @@ df["dollars"] = df["dollars"].fillna(0)
 # remove duplicates
 df = df.drop_duplicates()
 
-df.to_csv(r"C:\Users\om\Desktop\trade_data_project\data\final\port_trade_dataset_clean.csv", index=False)
+df.to_csv(r"data\final\port_trade_dataset_clean.csv", index=False)
 
 print("Dataset cleaned")

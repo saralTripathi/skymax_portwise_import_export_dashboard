@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_path = r"C:\Users\om\Desktop\trade_data_project\data\raw\ipa_ports.csv"
+file_path = r"data\raw\ipa_ports.csv"
 
 df = pd.read_csv(file_path)
 

@@ -2,9 +2,9 @@ import pandas as pd
 
 print("Loading datasets")
 
-ppac = pd.read_csv("C:\\Users\\om\\Desktop\\trade_data_project\\data\\processed\\ppac_cleaned.csv")
+ppac = pd.read_csv("data\\processed\\ppac_cleaned.csv")
 
-ports = pd.read_csv("C:\\Users\\om\\Desktop\\trade_data_project\\data\\processed\\ipa_cleaned.csv")
+ports = pd.read_csv("data\\processed\\ipa_cleaned.csv")
 
 ports = ports[["port"]]
 
@@ -15,7 +15,7 @@ final = final[
 ]
 
 final.to_csv(
-    r"C:\Users\om\Desktop\trade_data_project\data\final\port_trade_dataset_clean.csv",
+    r"data\final\port_trade_dataset_clean.csv",
     index=False
 )
 

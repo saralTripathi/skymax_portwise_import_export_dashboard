@@ -170,12 +170,6 @@ Since port-wise product data is not publicly available, this project uses a port
 
 ---
 
-##  Author
-- Ayush Mishra
-- Saral Tripathi  
-- Shani Sao
-
----
 
 ##  Conclusion
 This project demonstrates a production-style data pipeline combining:

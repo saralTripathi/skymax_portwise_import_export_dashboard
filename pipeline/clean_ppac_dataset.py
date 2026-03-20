@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_path = r"data/processed/ppac_combined.csv"
+file_path = r"data/processed/ppac_cleaned.csv"
 
 df = pd.read_csv(file_path)
 

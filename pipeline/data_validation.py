@@ -2,7 +2,7 @@ import pandas as pd
 
 print("Starting data validation...")
 
-df = pd.read_csv("data\\final\\port_trade_dataset_clean.csv")
+df = pd.read_csv("data/final/port_trade_dataset_clean.csv")
 
 # missing values
 missing = df.isnull().sum()

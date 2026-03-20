@@ -2,7 +2,7 @@ import pandas as pd
 
 print("Loading PPAC dataset...")
 
-df = pd.read_csv("data\\processed\\ppac_combined.csv")
+df = pd.read_csv("data/processed/ppac_combined.csv")
 
 # rename column
 df = df.rename(columns={"IMPORT/EXPORT": "product"})

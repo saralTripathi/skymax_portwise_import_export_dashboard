@@ -6,7 +6,7 @@ import os
 url = "https://www.ipa.nic.in/WriteReadData/Links/Major%20Ports%20Traffic%20for%20April%20to%20March%2020259e57b7d3-36b9-4462-874f-da2431e33413.xlsx"
 
 # raw folder
-save_dir = r"data\raw"
+save_dir = r"data/raw"
 os.makedirs(save_dir, exist_ok=True)
 
 excel_path = os.path.join(save_dir, "ipa_ports.xlsx")

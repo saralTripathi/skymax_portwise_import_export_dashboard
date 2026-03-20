@@ -33,7 +33,7 @@ def clean_html(value):
 
 
 # RAW DATA PATH
-save_dir = r"data\raw"
+save_dir = r"data/raw"
 os.makedirs(save_dir, exist_ok=True)
 
 year_label = f"{years[-1][:4]}-{years[0][:4]}"

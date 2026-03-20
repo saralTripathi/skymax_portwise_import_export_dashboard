@@ -1,0 +1,1 @@
+print("Trade Data Pipeline Started 🚀")

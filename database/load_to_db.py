@@ -1,53 +1,38 @@
 import pandas as pd
-import psycopg2
+import os
+from sqlalchemy import create_engine
 
 print("Loading final dataset...")
 
-df = pd.read_csv(r"data/final/port_trade_dataset_clean.csv")
+# ✅ correct file path (your latest pipeline output)
+file_path = os.path.join("data", "final", "final_dataset.csv")
 
-conn = psycopg2.connect(
-    database="petroleum_trade",
-    user="postgres",
-    password="Saral@2004",
-    host="localhost",
-    port="5432"
+# check file exists
+if not os.path.exists(file_path):
+    raise Exception(f"File not found: {file_path}")
+
+df = pd.read_csv(file_path)
+
+print("Dataset loaded successfully")
+print("Rows:", len(df))
+
+# ✅ get DATABASE_URL from environment (Render)
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise Exception("DATABASE_URL not set in environment variables")
+
+print("Connecting to database...")
+
+# create engine
+engine = create_engine(DATABASE_URL)
+
+# 🔥 FAST upload (replaces slow loop)
+df.to_sql(
+    "trade_data",        # table name
+    engine,
+    if_exists="replace", # or "append" if needed
+    index=False
 )
 
-cursor = conn.cursor()
-
-print("Inserting data into database...")
-
-for _, row in df.iterrows():
-
-    cursor.execute(
-        """
-        INSERT INTO trade_data (
-        year,
-        port,
-        product,
-        import_export,
-        month,
-        quantity,
-        rupees,
-        dollars
-        )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-        """,
-        (
-            row["Year"],
-            row["port"],
-            row["product"],
-            row["import_export"],
-            row["Month"],
-            row["quantity"],
-            row["rupees"],
-            row["dollars"]
-        )
-    )
-
-conn.commit()
-
-cursor.close()
-conn.close()
-
-print("Data inserted successfully")
+print("Data loaded to database successfully")

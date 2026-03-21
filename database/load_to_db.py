@@ -3,7 +3,7 @@ import psycopg2
 
 print("Loading final dataset...")
 
-df = pd.read_csv(r"data/final/port_trade_dataset_final.csv")
+df = pd.read_csv(r"data/final/port_trade_dataset_clean.csv")
 
 conn = psycopg2.connect(
     database="petroleum_trade",

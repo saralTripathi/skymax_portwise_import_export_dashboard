@@ -46,7 +46,7 @@ final_df = final_df.groupby(
 os.makedirs("data/final", exist_ok=True)
 
 # save file
-final_df.to_csv("data/final/final_dataset.csv", index=False)
+final_df.to_csv("data/final/port_trade_dataset.csv", index=False)
 
 print("Final dataset created successfully")
 print("Rows:", len(final_df))

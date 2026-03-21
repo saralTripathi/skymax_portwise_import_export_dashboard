@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 print("Loading final dataset...")
 
 # ✅ correct file path (your latest pipeline output)
-file_path = os.path.join("data", "final", "final_dataset.csv")
+file_path = os.path.join("data", "final", "port_trade_dataset_clean.csv")
 
 # check file exists
 if not os.path.exists(file_path):

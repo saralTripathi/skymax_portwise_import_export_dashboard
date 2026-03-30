@@ -56,11 +56,11 @@ PPAC (Product Data)      IPA (Port Data)
 ##  Project Structure
 trade_data_project/
 │
-├── scraper/
+ ├── scraper/
 │   ├── ppac_import_export_scraper.py
 │   ├── ipa_scraper.py
 │
-├── pipeline/
+ ├── pipeline/
 │   ├── merge_ppac.py
 │   ├── clean_ppac_dataset.py
 │   ├── clean_ipa_data.py
@@ -70,19 +70,19 @@ trade_data_project/
 │   ├── data_validation.py
 │   ├── run_pipeline.py
 │
-├── database/
+ ├── database/
 │   ├── load_to_db.py
 │
-├── api/
+ ├── api/
 │   ├── app.py
 │
-├── data/
+ ├── data/
 │   ├── raw/
 │   ├── processed/
 │   ├── final/
 │
-├── requirements.txt
-└── README.md
+ ├── requirements.txt
+ └── README.md
 
 ---
 

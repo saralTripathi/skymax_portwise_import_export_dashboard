@@ -57,13 +57,9 @@ PPAC (Product Data)      IPA (Port Data)
 trade_data_project/
 
 │
-
- ├── scraper/
- 
+├── scraper/
 │   ├── ppac_import_export_scraper.py
-
 │   ├── ipa_scraper.py
-
 │
  ├── pipeline/
  
